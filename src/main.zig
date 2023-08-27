@@ -1,24 +1,8 @@
 const std = @import("std");
+const stdouta = std.io.getStdOut().writer();
 
 const TWriter: type = std.fs.File.Writer;
 const TReader: type = std.fs.File.Reader;
-
-const Rect = struct {
-    width: u32,
-    height: u32,
-    fn calcArea(self: *Rect) u32 {
-        return self.width * self.height;
-    }
-};
-
-const rect = Rect{ .width = 10, .height = 20 };
-
-const Command = enum {
-    Exit,
-    Help,
-    Hello,
-    Sum,
-};
 
 fn print_cmds() !void {
     const stdout = std.io.getStdOut().writer();
@@ -37,10 +21,7 @@ fn add(a: i8, b: i8) i8 {
 const delimiter = '\n';
 
 fn get_input_num() !i64 {
-    const stdout = std.io.getStdOut().writer();
     const stdin = std.io.getStdIn().reader();
-
-    try stdout.print("Enter a number: ", .{});
 
     var buf: [8]u8 = undefined;
 
@@ -52,18 +33,29 @@ fn get_input_num() !i64 {
     }
 }
 
-pub fn main() !void {
-    const stdout = std.io.getStdOut().writer();
-    _ = stdout;
+fn sum_input_nums() void {
     var val_a: i64 = undefined;
     var val_b: i64 = undefined;
 
+    //TODO: -1 should be allowed
+    std.debug.print("Enter first number\n", .{});
+    val_a = get_input_num() catch -1;
+    std.debug.print("Enter second number\n", .{});
+    val_b = get_input_num() catch -1;
+
+    const sum_vals = val_a + val_b;
+
+    return std.debug.print("Sum of {d} + {d} = {d}\n", .{ val_a, val_b, sum_vals });
+}
+
+pub fn main() !void {
     try print_cmds();
+
     while (true) {
         const num = get_input_num() catch -1;
         switch (num) {
             0 => {
-                std.debug.print("Goodbye!\n", .{});
+                std.debug.print("Terminated process.\n", .{});
                 break;
             },
             1 => {
@@ -73,17 +65,10 @@ pub fn main() !void {
                 std.debug.print("Hello world!\n", .{});
             },
             3 => {
-                std.debug.print("Enter first number\n", .{});
-                //TODO: -1 should be allowed
-                val_a = get_input_num() catch -1;
-                std.debug.print("Enter second number\n", .{});
-                val_b = get_input_num() catch -1;
-
-                const sum_vals = val_a + val_b;
-                std.debug.print("Sum of {d} + {d} = {d}\n", .{ val_a, val_b, sum_vals });
+                sum_input_nums();
             },
             else => {
-                std.debug.print("Invalid input: {d}\n", .{num});
+                std.debug.print("Invalid input, type 1 to see help\n", .{});
             },
         }
     }
